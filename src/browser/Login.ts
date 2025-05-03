@@ -2,8 +2,8 @@ import { Page } from "puppeteer";
 import { Config } from "../config/Config.js";
 
 export async function loginIfNeeded(page: Page) {
-	// Try to access postings directly
-	await page.goto(`${Config.scopeUrl}/myAccount/co-op/postings.htm`, {
+	// Try to access dashboard directly
+	await page.goto(`${Config.scopeUrl}/myAccount/dashboard.htm`, {
 		waitUntil: "networkidle2",
 	});
 
@@ -28,11 +28,6 @@ export async function loginIfNeeded(page: Page) {
 		console.log("Waiting for You to Approve 2FA on Your Phone...");
 		await page.waitForFunction(() => window.location.href.includes("/myAccount/dashboard.htm"), { timeout: 0 });
 		console.log("2FA Complete. Logged in!");
-
-		// Navigate back to postings
-		await page.goto(`${Config.scopeUrl}/myAccount/co-op/postings.htm`, {
-			waitUntil: "networkidle2",
-		});
 	} else {
 		console.log("Logged In Successfully Using Session Cache.");
 	}

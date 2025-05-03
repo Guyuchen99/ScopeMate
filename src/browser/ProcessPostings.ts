@@ -20,8 +20,6 @@ export async function processPostings(page: Page) {
 
 	let processed = 0;
 	for (const row of jobRows) {
-		processed++; 
-
 		const jobId = (await row.evaluate((el) => el.id)).replace("posting", "").trim();
 
 		if (jobAnalysisMap[jobId]) {
@@ -54,18 +52,25 @@ export async function processPostings(page: Page) {
 			applyButton!.click(),
 		]);
 
-		// Wait for job description
+		// Wait for job description and application procedure
 		await newPage.waitForSelector("span.np-view-question--28", { timeout: 10000 });
 		const fullJobDescription = await newPage.$eval("span.np-view-question--28", (el) => el.innerText.trim());
+		await newPage.waitForSelector("span.np-view-question--35", { timeout: 10000 });
+		const applicationProcedure = await newPage.$eval("span.np-view-question--35", (el) => el.innerText.trim());
 
+		processed++;
 		console.log(`Processing Job #${processed}: ${jobTitle}`);
-		const jobDetails: JobDetails = { jobId, jobTitle, companyName, fullJobDescription };
+		const jobDetails: JobDetails = { jobId, jobTitle, companyName, applicationProcedure, fullJobDescription };
 		await processSinglePosting(newPage, page, jobDetails);
+
+		if (processed > 5) {
+			break;
+		}
 	}
 }
 
 async function processSinglePosting(newPage: Page, mainPage: Page, jobDetails: JobDetails) {
-	const { jobId, jobTitle, companyName, fullJobDescription } = jobDetails;
+	const { jobId, jobTitle, companyName, applicationProcedure, fullJobDescription } = jobDetails;
 
 	let isDev: boolean | undefined;
 	let isFit: boolean | undefined;
@@ -79,7 +84,7 @@ async function processSinglePosting(newPage: Page, mainPage: Page, jobDetails: J
 		reason = result.reason;
 
 		const jobAnalysisMap: JobAnalysisMap = {
-			[jobId]: { jobTitle, companyName, isDev, isFit, reason },
+			[jobId]: { jobTitle, companyName, applicationProcedure, isDev, isFit, reason },
 		};
 		saveAsJSONFile("data/job_analysis.json", jobAnalysisMap);
 	} catch (err) {
@@ -95,6 +100,15 @@ async function processSinglePosting(newPage: Page, mainPage: Page, jobDetails: J
 			const coverLetter = await generateCoverLetter(companyName, fullJobDescription);
 			await saveAsPDF(safeFilename, coverLetter, "data/cover_letters");
 			console.log(`Cover Letter Generated for: ${jobTitle}`);
+
+			if (applicationProcedure === "Through UBC Science Co-op") {
+				const coverLetterPath = path.resolve("data", "cover_letters", `${safeFilename}.pdf`);
+				const jobPackage = {
+					jobId,
+					coverLetterPath,
+				};
+				await sendScopeApplication(newPage, jobPackage);
+			}
 		} catch (err) {
 			console.error(`Error Generating Cover Letter: ${err}`);
 		}
@@ -102,7 +116,97 @@ async function processSinglePosting(newPage: Page, mainPage: Page, jobDetails: J
 		console.log(`Skipping Cover Letter for: ${jobTitle} (Not dev or not a fit)`);
 	}
 
-	// // Close detail tab, bring main page to front
+	// Close detail tab, bring main page to front
 	await newPage.close();
 	await mainPage.bringToFront();
+}
+
+async function sendScopeApplication(page: Page, jobPackage: any) {
+	const { jobId, coverLetterPath } = jobPackage;
+
+	await Promise.all([page.click("button.applyButton"), page.waitForNavigation({ waitUntil: "networkidle2" })]);
+
+	await page.waitForSelector('input[name="applyOption"][value="customPkg"]', { visible: true });
+	await page.click('input[name="applyOption"][value="customPkg"]');
+
+	await Promise.all([
+		page.evaluate(() => {
+			const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("a"));
+			const target = links.find((link) => link.textContent?.includes("Click if you need to upload a new document"));
+			if (target) target.click();
+		}),
+		page.waitForNavigation({ waitUntil: "networkidle2" }),
+	]);
+
+	await page.waitForSelector("#docName", { visible: true });
+	await page.type("#docName", `${jobId}_CoverLetter`);
+
+	await page.waitForSelector("#docType", { visible: true });
+	await page.select("#docType", "1");
+
+	const inputUploadHandle = await page.$('input[type="file"]#fileUpload_docUpload');
+	if (inputUploadHandle) {
+		await inputUploadHandle.uploadFile(coverLetterPath);
+	}
+
+	await new Promise((resolve) => setTimeout(resolve, 3000));
+
+	await page.waitForSelector("#submitFileUploadFormBtn", { visible: true });
+	await page.click("#submitFileUploadFormBtn");
+
+	await page.waitForSelector('input[name="applyOption"][value="customPkg"]', { visible: true });
+	await page.click('input[name="applyOption"][value="customPkg"]');
+
+	await page.waitForSelector("input#packageName", { visible: true });
+	await page.type("input#packageName", `${jobId}_Package`);
+
+	await page.evaluate(() => {
+		const select = document.querySelector<HTMLSelectElement>("#requiredInPackage11");
+		if (select) {
+			const option = Array.from(select.options).find((opt) => opt.textContent?.includes("Summary_Sheet_2025"));
+			if (option) {
+				select.value = option.value;
+				select.dispatchEvent(new Event("change", { bubbles: true }));
+			}
+		}
+	});
+
+	await page.evaluate((jobId) => {
+		const select = document.querySelector<HTMLSelectElement>("#requiredInPackage1");
+		if (select) {
+			const option = Array.from(select.options).find((opt) => opt.textContent?.includes(`${jobId}_CoverLetter`));
+			if (option) {
+				select.value = option.value;
+				select.dispatchEvent(new Event("change", { bubbles: true }));
+			}
+		}
+	}, jobId);
+
+	await page.evaluate(() => {
+		const select = document.querySelector<HTMLSelectElement>("#requiredInPackage2");
+		if (select) {
+			const option = Array.from(select.options).find((opt) => opt.textContent?.includes("Resume_2025"));
+			if (option) {
+				select.value = option.value;
+				select.dispatchEvent(new Event("change", { bubbles: true }));
+			}
+		}
+	});
+
+	await page.evaluate(() => {
+		const select = document.querySelector<HTMLSelectElement>("#requiredInPackage8");
+
+		if (select) {
+			const option = Array.from(select.options).find((opt) => opt.textContent?.includes("Student Transcript"));
+			if (option) {
+				select.value = option.value;
+				select.dispatchEvent(new Event("change", { bubbles: true }));
+			}
+		}
+	});
+
+	await new Promise((resolve) => setTimeout(resolve, 3000));
+	await page.waitForSelector('input[type="submit"][value="Submit Application"]', { visible: true });
+	await page.click('input[type="submit"][value="Submit Application"]');
+	console.log("Application Submitted!");
 }

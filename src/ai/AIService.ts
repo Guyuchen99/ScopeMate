@@ -58,6 +58,7 @@ export async function checkJobFitAndRole(title: string, description: string) {
 
 	let content = response?.choices?.[0]?.message?.content?.trim();
 	if (!content) {
+		console.error("Full Response:", response);
 		throw new Error(`No Valid Response from AI: ${response}`);
 	}
 
@@ -103,13 +104,14 @@ export async function generateCoverLetter(companyName: string, jobDescription: s
           You only output the updated cover letter text with no extraneous comments, disclaimers, or markdown.
 
           Instructions:
-            1. Use the user's original cover letter structure and wording as much as possible.
+            1. Use the user's original cover letter structure and line breaks and wording as much as possible.
             2. Replace date with today's date ${formattedDate}.
             3. Replace references to the old company name with ${companyName}.
             4. Update the "Re:" line, the first paragraph, and the final paragraph to reflect the new company details and role.
-            5. Use simpler language where it improves clarity.
-            6. Keep the tone confident but not overly formal.
-            7. Absolutely do not include anything outside of the cover letter text (no code fences, no triple backticks, no disclaimers).
+            5. Preserve line breaks at the end. Ensure "Best regards," is followed by a new line with "Yuchen Gu" on its own line.
+            6. Use simpler language where it improves clarity.
+            7. Keep the tone confident but not overly formal.
+            8. Absolutely do not include anything outside of the cover letter text (no code fences, no triple backticks, no disclaimers).
         `,
 			},
 			{

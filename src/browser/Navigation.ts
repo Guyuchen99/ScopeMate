@@ -1,6 +1,11 @@
 import { Page } from "puppeteer";
+import { Config } from "../config/Config.js";
 
 export async function goToTargetPostings(page: Page, targetJobPostingTerm: string) {
+	await page.goto(`${Config.scopeUrl}/myAccount/co-op/postings.htm`, {
+		waitUntil: "networkidle2",
+	});
+
 	console.log(`Clicking the '${targetJobPostingTerm}' Link...`);
 
 	await Promise.all([

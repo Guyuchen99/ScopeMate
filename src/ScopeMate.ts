@@ -10,8 +10,8 @@ async function startScopeMate() {
 	await goToTargetPostings(page, Config.targetJobPostingTerm);
 	await processPostings(page);
 
-	console.log("All Jobs Scanned!!!");
-	await browser.close();
+	console.log("Processed 5 New Job Postings!!!");
+	// await browser.close();
 }
 
 startScopeMate();
