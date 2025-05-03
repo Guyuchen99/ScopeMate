@@ -1,0 +1,58 @@
+{
+  "169166": {
+    "jobTitle": "NEW F25 Global POISE Co-Op Student Clinical Research Assistant 169166",
+    "companyName": "BC Children's Hospital",
+    "isDev": true,
+    "isFit": true,
+    "reason": "The job involves working on a clinical research registry, such as the Global POISE database, which relates to data management and web development tasks (e.g., using REDCap for data entry)."
+  },
+  "169168": {
+    "jobTitle": "NEW F25 Marketing & Sales Co-op Student 169168",
+    "companyName": "Artron Laboratories Inc",
+    "isDev": false,
+    "isFit": false,
+    "reason": "The role is focused on marketing, sales, and digital campaigns without requiring software development or technical skills."
+  },
+  "169169": {
+    "jobTitle": "NEW F25 UX Designer Co-op/Intern 169169",
+    "companyName": "Nokia",
+    "isDev": false,
+    "isFit": true,
+    "reason": "The position is a UX Designer Co-op/Intern role, aligning with the user's interest in user-centric design (UX) rather than software development."
+  },
+  "169170": {
+    "jobTitle": "NEW F25 Cyber Security Dome Test Eng Student 169170",
+    "companyName": "Nokia",
+    "isDev": true,
+    "isFit": true,
+    "reason": "The position involves developing application software and services to manage telecom networks, which aligns with software development and cybersecurity roles, including web/Backend and Mobile App Development."
+  },
+  "169171": {
+    "jobTitle": "NEW F25 Various Opportunities - AI/Analytics/Next-Gen AI 169171",
+    "companyName": "Nokia",
+    "isDev": true,
+    "isFit": true,
+    "reason": "These jobs are relevant to AI or analytical roles, which align with Full Stack Development, Web Development, and Backend."
+  },
+  "169172": {
+    "jobTitle": "NEW F25 Research Assistant 169172",
+    "companyName": "Agriculture and Agri-Food Canada",
+    "isDev": false,
+    "isFit": false,
+    "reason": "The job involves agricultural and research tasks related to forage crops and field operations, which are not software development-related roles. The responsibilities include managing materials, conducting experiments, and data collection, not coding or developing applications."
+  },
+  "169173": {
+    "jobTitle": "NEW F25 Business Development & Marketing Assistant Co-op 169173",
+    "companyName": "Applied Biological Materials Inc. (ABM)",
+    "isDev": false,
+    "isFit": false,
+    "reason": "This role supports business development and marketing initiatives, not software development or coding-related tasks. It aligns with marketing, sales, and collaboration skills rather than developer interests."
+  },
+  "169174": {
+    "jobTitle": "NEW F25 Laboratory Assistant (Co-op) 169174",
+    "companyName": "Applied Biological Materials Inc. (ABM)",
+    "isDev": false,
+    "isFit": false,
+    "reason": "The job position involves laboratory assistance and biotech-related tasks, which aligns with biological sciences rather than software or web development roles."
+  }
+}

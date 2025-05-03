@@ -1,0 +1,23 @@
+{
+	"name": "scopemate",
+	"version": "1.0.0",
+	"main": "dist/ScopeMate.js",
+	"type": "module",
+	"scripts": {
+		"dev": "npx tsc && node dist/ScopeMate.js",
+		"test": "npx tsc && node dist/config/Config.js"
+	},
+	"keywords": [],
+	"author": "Yuchen Gu",
+	"license": "GPL-3.0-only",
+	"description": "Automated Scope Job Search AI Helper",
+	"dependencies": {
+		"dotenv": "^16.5.0",
+		"openai": "^4.96.2",
+		"pdf-lib": "^1.17.1",
+		"puppeteer": "^24.7.2"
+	},
+	"devDependencies": {
+		"typescript": "^5.8.3"
+	}
+}
