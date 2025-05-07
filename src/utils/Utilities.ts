@@ -31,6 +31,8 @@ export function saveAsJSONFile(filePath: string, data: JobAnalysisMap) {
 }
 
 export async function saveAsPDF(filename: string, content: string, folder: string) {
+	content = content.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, "");
+
 	// Ensure folder exists
 	fs.mkdirSync(folder, { recursive: true });
 
@@ -126,14 +128,14 @@ export async function saveAsPDF(filename: string, content: string, folder: strin
 
 	// Draws a line of text while searching for email addresses.
 	// Any email found will be drawn in blue, underlined, and clickable.
-	function drawTextWithEmails(page: PDFPage, line: string, startX: number, y: number) {
+	function drawTextWithEmailsAndUrls(page: PDFPage, line: string, startX: number, y: number) {
 		let currentX = startX;
 		// Regular expression to match an email address.
-		const emailRegex = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
+		const regex = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})|(https?:\/\/[^\s]+)/g;
 		let lastIndex = 0;
 		let match;
 
-		while ((match = emailRegex.exec(line)) !== null) {
+		while ((match = regex.exec(line)) !== null) {
 			const emailText = match[0];
 			const matchIndex = match.index;
 
@@ -160,7 +162,7 @@ export async function saveAsPDF(filename: string, content: string, folder: strin
 			addLinkAnnotation(page, currentX, y, emailWidth, fontSize, `mailto:${emailText}`);
 
 			currentX += emailWidth;
-			lastIndex = emailRegex.lastIndex;
+			lastIndex = regex.lastIndex;
 		}
 
 		// Draw any remaining text after the last email.
@@ -187,7 +189,7 @@ export async function saveAsPDF(filename: string, content: string, folder: strin
 			}
 
 			// Instead of drawing the whole text at once, we now handle emails specially.
-			drawTextWithEmails(page, line, margin, y);
+			drawTextWithEmailsAndUrls(page, line, margin, y);
 
 			// Move down to the next line.
 			y -= lineHeight;

@@ -3,12 +3,12 @@ import { Config } from "../config/Config.js";
 
 const openai = new OpenAI({
 	baseURL: "https://openrouter.ai/api/v1",
-	apiKey: Config.openRouterApiKey,
+	apiKey: Config.openRouter.apiKey,
 });
 
 export async function checkJobFitAndRole(title: string, description: string) {
 	const response = await openai.chat.completions.create({
-		model: Config.openRouterModel,
+		model: Config.openRouter.basicModel,
 		messages: [
 			{
 				role: "system",
@@ -22,8 +22,8 @@ export async function checkJobFitAndRole(title: string, description: string) {
           The user's primary developer interests are:
             - Frontend
             - Backend
-            - Full Stack Development
             - Web Development
+            - Full Stack Development
             - Mobile App Development
             - Game Development
             - QA Automation / Testing
@@ -46,9 +46,9 @@ export async function checkJobFitAndRole(title: string, description: string) {
 			{
 				role: "user",
 				content: `
-          Title: ${title}
+          Title: ${title},
 
-          Description: ${description}
+          Description: ${description},
 
           Return valid JSON only, in the specified format. No extra text or markdown.
         `,
@@ -72,8 +72,8 @@ export async function checkJobFitAndRole(title: string, description: string) {
 	try {
 		const parsed = JSON.parse(content);
 		return {
-			isDev: !!parsed.isDev,
-			isFit: !!parsed.isFit,
+			isDev: Boolean(parsed.isDev),
+			isFit: Boolean(parsed.isFit),
 			reason: parsed.reason || "",
 		};
 	} catch (err) {
@@ -95,7 +95,7 @@ export async function generateCoverLetter(companyName: string, jobDescription: s
 	});
 
 	const response = await openai.chat.completions.create({
-		model: Config.openRouterModel,
+		model: Config.openRouter.basicModel,
 		messages: [
 			{
 				role: "system",
@@ -108,7 +108,7 @@ export async function generateCoverLetter(companyName: string, jobDescription: s
             2. Replace date with today's date ${formattedDate}.
             3. Replace references to the old company name with ${companyName}.
             4. Update the "Re:" line, the first paragraph, and the final paragraph to reflect the new company details and role.
-            5. Preserve line breaks at the end. Ensure "Best regards," is followed by a new line with "Yuchen Gu" on its own line.
+            5. Preserve line breaks at the end. Ensure "Best regards," is followed by a new line. 
             6. Use simpler language where it improves clarity.
             7. Keep the tone confident but not overly formal.
             8. Absolutely do not include anything outside of the cover letter text (no code fences, no triple backticks, no disclaimers).
@@ -119,7 +119,7 @@ export async function generateCoverLetter(companyName: string, jobDescription: s
 				content: `
           Today's Date: ${formattedDate}
           Company Name: ${companyName}
-          Original Cover Letter: ${Config.coverLetterTemplate}
+          Original Cover Letter: ${Config.templates.coverLetter}
           Job Description:${jobDescription}
 
           Rewrite the cover letter to match these new details. Output only the revised cover letter text.

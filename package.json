@@ -10,7 +10,7 @@
 	"keywords": [],
 	"author": "Yuchen Gu",
 	"license": "GPL-3.0-only",
-	"description": "Automated Scope Job Search AI Helper",
+	"description": "Automated UBC Scope Job Search AI Helper",
 	"dependencies": {
 		"dotenv": "^16.5.0",
 		"openai": "^4.96.2",

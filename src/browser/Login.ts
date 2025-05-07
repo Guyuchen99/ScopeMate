@@ -2,8 +2,8 @@ import { Page } from "puppeteer";
 import { Config } from "../config/Config.js";
 
 export async function loginIfNeeded(page: Page) {
-	// Try to access dashboard directly
-	await page.goto(`${Config.scopeUrl}/myAccount/dashboard.htm`, {
+	// Try to access the dashboard directly
+	await page.goto(`${Config.scope.url}/myAccount/dashboard.htm`, {
 		waitUntil: "networkidle2",
 	});
 
@@ -11,7 +11,7 @@ export async function loginIfNeeded(page: Page) {
 		console.log("Not Logged In. Performing Login...");
 
 		// Go to the SCOPE login portal
-		await page.goto(`${Config.scopeUrl}/students/cwl-current-student-login.htm`);
+		await page.goto(`${Config.scope.url}/students/cwl-current-student-login.htm`);
 
 		// Click the CWL Login button (anchor with Shibboleth SSO)
 		await page.waitForSelector('a[href*="Shibboleth.sso"]');
